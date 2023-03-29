@@ -12,13 +12,15 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.get("/get-text", async (req, res) => {
-  const text = await matlab.getText("Hello world");
+app.get("/run-function/:fileName",async (req,res) => {
+  const {fileName} = req.params;
+  const query = req.query;
+  const matlabRes = await matlab.runFunction({fileName, params: query})
   res.send({
     data: {
-      text,
-    },
-  });
+      matlabRes
+    }
+  })
 });
 
 app.listen(port, () => {
