@@ -1,6 +1,12 @@
+const fs = require("fs");
+const { exec } = require("child_process");
+const getMatlabScripts = require("./getMatlabScripts");
+
 const hasMATLAB = () => {
     return !shell.which("matlab");
 };
+
+const scripts = getMatlabScripts()
 
 /**
  * Checks MATLAB version
@@ -11,13 +17,17 @@ const getVersion = () => {
       exec(
         `matlab -batch "run('${scripts.getVersion}()')`,
         (error, stdout, stderr) => {
-          return resolve(stdout.split("\r\n")[0]);
+          if(!error){
+            return resolve(stdout.split("\r\n")[0]);
+          } else {
+            return reject(error)
+          }
         }
       );
     });
   };
 
-  module.exports = getVersion
   module.exports = {
+    getVersion,
     hasMATLAB
   }

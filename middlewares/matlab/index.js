@@ -1,14 +1,11 @@
-const fs = require("fs");
-const { exec } = require("child_process");
-
-const getVersion = require('./getVersion')
+const {getVersion,hasMATLAB} = require('./getVersion')
 const getMatlabScripts = require('./getMatlabScripts')
 const getMatlabFunctionWithParams = require('./getMatlabFunctionWithParams')
 const getMatlabParamsFromObject = require('./getMatlabParamsFromObject')
 
 /**
  * Run function with parameters
- * @returns {Object} data
+ * @returns {Promise} JSON output from MATLAB || error
  */
 const runFunction = ({fileName, params}) => {
   return new Promise((resolve, reject)=>{
@@ -16,8 +13,12 @@ const runFunction = ({fileName, params}) => {
     exec(
       `matlab -batch "${matlabCommand}"`,
       (error, stdout, stderr) => {
-        console.log(stdout);
-        return resolve(JSON.parse(stdout.split("\r\n")[0]));
+        if(!error){
+          console.log(stdout);
+          return resolve(JSON.parse(stdout.split("\r\n")[0]));
+        } else {
+          return reject(error)
+        }
       }
     )
   })
@@ -25,6 +26,7 @@ const runFunction = ({fileName, params}) => {
 
 module.exports = {
   runFunction,
+  hasMATLAB,
   getVersion,
   getMatlabScripts,
   getMatlabFunctionWithParams,
